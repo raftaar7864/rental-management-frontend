@@ -452,7 +452,7 @@ const AdminRooms = () => {
                 <Form.Label>Select Building</Form.Label>
                 <Form.Select value={addRoomBuildingId} onChange={(e) => setAddRoomBuildingId(e.target.value)}>
                   <option value="">Choose building</option>
-                  {buildings.map((b) => <option key={b._id} value={b._1}>{b.name}</option>)}
+                  {buildings.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}
                 </Form.Select>
               </Form.Group>
             )}
