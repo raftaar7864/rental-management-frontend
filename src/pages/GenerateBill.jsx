@@ -113,6 +113,9 @@ export default function GenerateBill() {
   const [saving, setSaving] = useState(false);
   const [currentBill, setCurrentBill] = useState(null);
 
+  // NEW: send notifications checkbox state
+  const [sendNotifications, setSendNotifications] = useState(true);
+
   const prevValidMonth = useRef(selectedMonth);
   const { user } = useContext(AuthContext);
 
@@ -280,6 +283,7 @@ export default function GenerateBill() {
     setNotes("");
     setPaymentLink("");
     setCurrentBill(null);
+    setSendNotifications(true); // default to true when opening
     setShowModal(true);
 
     if (room.billId) {
@@ -305,6 +309,7 @@ export default function GenerateBill() {
 
         setNotes(b?.notes || "");
         setPaymentLink(b?.paymentLink || "");
+        setSendNotifications(true); // keep checked by default when editing existing bill
       } catch (err) {
         console.error("openBillModal", err);
         toast.error("Failed to load bill details");
@@ -376,6 +381,8 @@ export default function GenerateBill() {
         totals,
         notes: notes || undefined,
         paymentLink: paymentLink || undefined,
+        // NEW: include flag to indicate whether to send notifications
+        sendNotifications: !!sendNotifications,
       };
 
       let saved = null;
@@ -526,25 +533,21 @@ export default function GenerateBill() {
      Render
      ------------------------- */
   return (
-    <Container className="py-2">
-      <Row className="mb-3">
-        <Col>
+    <Container fluid className="page-container">
+      {/* Header */}
+      <div className="page-header d-flex justify-content-between flex-wrap align-items-start mb-2">
+        <div>
           <motion.h3 initial={{ y: -6, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
             Generate & Manage Monthly Bills
           </motion.h3>
-        </Col>
-      </Row>
+          <div className="text-muted small">Generate monthly bills</div>
+        </div>
 
-      <Row className="mb-3">
-        <Col xs={12}>
-          <Card className="p-3 shadow-sm border-0 filter-card" >
-            <Card.Body>
-              <Row className="g-3 align-items-end">
-                
-                {/* Select Building */}
-                <Col xs={12} md={8} lg={4}>
+      <Row className="g-3 mb-3">
+        <Col xs={12} md={6} lg={4}>
+          <Card className="p-3 h-100 shadow-sm" style={{ borderRadius: 12 }}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold text-secondary">
+                    <Form.Label className="fw-bold">
                       Select Building
                     </Form.Label>
                     {loadingBuildings ? (
@@ -567,10 +570,12 @@ export default function GenerateBill() {
                       </Form.Select>
                     )}
                   </Form.Group>
+                </Card>
                 </Col>
 
                 {/* Select Month */}
-                <Col xs={12} md={8} lg={4}>
+                <Col xs={12} md={6} lg={4}>
+                <Card className="p-3 h-100 shadow-sm" style={{ borderRadius: 12 }}>
                   <Form.Group>
                     <Form.Label className="fw-semibold text-secondary">
                       Select Month <span className="ms-1 small text-muted">(Only completed months allowed)</span>
@@ -582,14 +587,14 @@ export default function GenerateBill() {
                       className="shadow-sm"
                     />
                   </Form.Group>
+                </Card>
                 </Col>
 
                 {/* Actions */}
-                <Col xs={12} md={8} lg={4}>
-                  <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    
-                    {/* Counts */}
-                    <div className="d-flex flex-wrap gap-3">
+                <Col xs={12} md={6} lg={4}>
+                  <Card className="p-3 h-100 shadow-sm" style={{ borderRadius: 12 }}>
+                  {/* Counts */}
+                 <div className="d-flex flex-wrap gap-3 align-items-center justify-content-center">
                       <div className="px-3 py-2 bg-light rounded text-center">
                         <div className="small text-muted">Generated</div>
                         <div className="fw-bold text-secondary">{generatedCount}</div>
@@ -603,16 +608,12 @@ export default function GenerateBill() {
                         <div className="fw-bold text-danger">{unpaidCount}</div>
                       </div>
                     </div>
-                  </div>
-                </Col>
-
-              </Row>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      <Card className="shadow-sm">
+                  
+              </Card>
+            </Col>
+          </Row></div>
+      <div className="page-content">
+      <Card className="tenants-card">
       <Card.Body>
       <div className="d-flex align-items-center justify-content-between">
         <div>
@@ -648,7 +649,7 @@ export default function GenerateBill() {
           </ButtonGroup>
         </div>
       </div>
-
+      <div className="inner-scroll">
           {loadingRooms ? (
             <div className="text-center py-5">
               <Spinner animation="border" />
@@ -660,7 +661,7 @@ export default function GenerateBill() {
           ) : (
             <Row className="mt-3">
               {(filteredRooms || []).map((r, idx) => (
-                <Col xs={12} md={12} lg={6} key={r._id || r.id} className="mb-3">
+                <Col xs={12} md={6} lg={4} key={r._id || r.id} className="mb-3">
                   <Card
                     className={`h-100 room-card ${
                       r.paymentStatus === "Paid" ? "paid" : r.billStatus === "Generated" ? "generated" : "default"
@@ -737,8 +738,10 @@ export default function GenerateBill() {
               ))}
             </Row>
           )}
+          </div>
         </Card.Body>
       </Card>
+      </div>
 
       {/* Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
@@ -900,6 +903,23 @@ export default function GenerateBill() {
                   </Form.Group>
                 </Col>
               </Row>
+
+              {/* NEW: Send notifications checkbox */}
+              {modalMode !== "view" && (
+                <Row className="mt-3">
+                  <Col>
+                    <Form.Check
+                      type="checkbox"
+                      label="Send notifications (Email & WhatsApp) to tenant"
+                      checked={sendNotifications}
+                      onChange={(e) => setSendNotifications(e.target.checked)}
+                    />
+                    <Form.Text className="text-muted">
+                      If unchecked the bill will be generated but no email/WhatsApp will be sent.
+                    </Form.Text>
+                  </Col>
+                </Row>
+              )}
 
               {/* existing bill summary & actions */}
               {currentBill && (

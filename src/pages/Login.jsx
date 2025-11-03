@@ -1,18 +1,16 @@
-// src/pages/Login.jsx
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  LogIn,
-  
-  Code2,
-  CreditCard,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import "react-toastify/dist/ReactToastify.css";
+
+// Redesigned Login component
+// - Removed "Forgot password"
+// - Responsive 2-column layout (illustration + form) on desktop, stacked on mobile
+// - Clean, accessible form with focused styling and subtle animation
+// - Keeps existing AuthContext login behavior and role-based redirect
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -24,20 +22,13 @@ export default function Login() {
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isMobile, setIsMobile] = useState(false);
 
   const emailRef = useRef(null);
 
   useEffect(() => {
-    const checkMobile = () =>
-      typeof window !== "undefined" ? window.innerWidth < 768 : false;
-
-    setIsMobile(checkMobile());
-    if (!checkMobile()) setTimeout(() => emailRef.current?.focus?.(), 120);
-
-    const onResize = () => setIsMobile(checkMobile());
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    // autofocus on desktop
+    const isMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
+    if (!isMobile) setTimeout(() => emailRef.current?.focus?.(), 120);
   }, []);
 
   async function handleSubmit(e) {
@@ -50,9 +41,8 @@ export default function Login() {
 
     setLoading(true);
     try {
-      // Pass remember flag if your backend supports it
       const data = await login(email, password, { remember });
-      const role = (data.user.role || "").toLowerCase();
+      const role = (data?.user?.role || "").toLowerCase();
       if (role === "admin") navigate("/admin/dashboard");
       else if (role === "manager") navigate("/manager/dashboard");
       else navigate("/");
@@ -64,127 +54,111 @@ export default function Login() {
     }
   }
 
-  // Visual-only social handlers — implement OAuth redirect if available
-  const handleSocialLogin = (provider) => {
-    // e.g. window.location = `/auth/${provider}` or call backend to start OAuth flow
-    alert(`Social login (${provider}) — implement handler if desired`);
-  };
-
   return (
-    <div className="login-root fullwidth-no-margin" aria-live="polite">
-      {/* Watermark centered, hidden on mobile via CSS */}
-      {!isMobile && (
-        <img
-          src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdTN2YWlidGZhaW9jYnFmMTZoM3Fnczh6d2diamZxNTlncmhidXlnaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/d9UAwX6gd6d3zYrTF5/giphy.gif"
-          alt=""
-          aria-hidden="true"
-          className="watermark-center"
-        />
-      )}
-
-      <motion.main
-        className="login-card glass"
-        initial={{ opacity: 0, y: 18, scale: 0.996 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.36, ease: "easeOut" }}
-        role="main"
+    <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+      <motion.div
+        className="login-wrapper"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
       >
-        <header className="login-header" aria-hidden>
-          <div className="logo-and-title">
-            <div className="logo-bubble">
-              <LogIn size={18} />
-            </div>
-            <div>
-              <h1 className="title" style={{ margin: 0 }}>
-                Welcome back
-              </h1>
-              <div className="subtitle">Sign in to your Rental Admin account</div>
-            </div>
-          </div>
-        </header>
+        <Card className="shadow-sm overflow-hidden" style={{ maxWidth: 920, borderRadius: 12 }}>
+          <Row className="g-0">
+            {/* Left visual column - hidden on small screens */}
+            <Col md={5} className="d-none d-md-flex bg-gradient align-items-center justify-content-center" style={{ background: 'linear-gradient(135deg,#0d6efd22,#19875411)' }}>
+              <div className="text-center px-3">
+                <img
+                  src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=60&auto=format&fit=crop"
+                  alt="office illustration"
+                  style={{ width: '100%', maxWidth: 260, borderRadius: 8 }}
+                />
+                <h4 className="mt-3 mb-0">Rental Admin</h4>
+                <p className="text-muted small">Manage buildings, rooms and tenants with ease.</p>
+              </div>
+            </Col>
 
-        <form className="login-form" onSubmit={handleSubmit} noValidate>
-          {error && (
-            <div className="error-box" role="alert">
-              {error}
-            </div>
-          )}
+            {/* Right form column */}
+            <Col xs={12} md={7} className="p-4">
+              <div className="d-flex flex-column h-100">
+                <div className="mb-3 text-center text-md-start">
+                  <h3 className="mb-1">Welcome back</h3>
+                  <div className="text-muted">Sign in to your Rental Admin account</div>
+                </div>
 
-          <label className="field">
-            <div className="field-label">
-              <Mail size={14} className="field-icon" />
-              <span className="label-text">Email</span>
-            </div>
-            <input
-              ref={emailRef}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="you@company.com"
-              required
-              aria-label="Email"
-            />
-          </label>
+                <Form onSubmit={handleSubmit} className="mt-2" noValidate>
+                  {error && (
+                    <div className="alert alert-danger py-2" role="alert">{error}</div>
+                  )}
 
-          <label className="field">
-            <div className="field-label">
-              <Lock size={14} className="field-icon" />
-              <span className="label-text">Password</span>
-              <button
-                type="button"
-                onClick={() => setShowPw((s) => !s)}
-                className="pw-toggle"
-                aria-pressed={showPw}
-                aria-label={showPw ? "Hide password" : "Show password"}
-              >
-                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type={showPw ? "text" : "password"}
-              placeholder="Enter your password"
-              required
-              aria-label="Password"
-              autoComplete="current-password"
-            />
-          </label>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="small text-muted d-flex align-items-center gap-2">
+                      <Mail size={14} /> Email
+                    </Form.Label>
+                    <Form.Control
+                      ref={emailRef}
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      required
+                      aria-label="Email"
+                    />
+                  </Form.Group>
 
-          <div className="row-between">
-            <label className="remember">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-                aria-label="Remember me"
-              />{" "}
-              Remember me
-            </label>
+                  <Form.Group className="mb-3">
+                    <div className="d-flex justify-content-between align-items-center mb-1">
+                      <label className="small text-muted d-flex align-items-center gap-2 mb-0"><Lock size={14} /> Password</label>
+                    </div>
 
-            <button
-              type="button"
-              className="link-like"
-              onClick={() => alert("Implement forgot password flow")}
-            >
-              Forgot password?
-            </button>
-          </div>
+                    <div className="input-group">
+                      <Form.Control
+                        type={showPw ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        required
+                        aria-label="Password"
+                        autoComplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => setShowPw((s) => !s)}
+                        aria-pressed={showPw}
+                        aria-label={showPw ? "Hide password" : "Show password"}
+                      >
+                        {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </Form.Group>
 
-          <button
-            type="submit"
-            className="submit-btn"
-            disabled={loading}
-            aria-disabled={loading}
-          >
-            {loading ? <span className="spinner" aria-hidden /> : <><LogIn size={16} /> Sign in</>}
-          </button>
+                  <div className="d-flex align-items-center justify-content-between mb-3">
+                    <Form.Check
+                      type="checkbox"
+                      id="rememberMe"
+                      label="Remember me"
+                      checked={remember}
+                      onChange={(e) => setRemember(e.target.checked)}
+                    />
+                    {/* Forgot password intentionally removed per request */}
+                  </div>
 
-          <div className="signup-note">
-            <small>Only Admins and Managers can sign in here.</small>
-          </div>
-        </form>
-      </motion.main>
+                  <div className="d-grid">
+                    <Button variant="primary" type="submit" disabled={loading} className="d-flex align-items-center justify-content-center gap-2">
+                      {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : <LogIn size={16} />}
+                      <span>{loading ? 'Signing in...' : 'Sign in'}</span>
+                    </Button>
+                  </div>
+
+                  <div className="mt-3 text-center small text-muted">Only Admins and Managers can sign in here.</div>
+                </Form>
+
+                <footer className="mt-auto pt-3 text-center text-muted small">© {new Date().getFullYear()} Rental Manager</footer>
+              </div>
+            </Col>
+          </Row>
+        </Card>
+      </motion.div>
     </div>
   );
 }

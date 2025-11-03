@@ -15,7 +15,7 @@ export default function App() {
       <NavBar />
 
       {/* Main content */}
-      <main style={{ padding: 15 }}>
+      <main>
         <AppRoutes />
       </main>
 

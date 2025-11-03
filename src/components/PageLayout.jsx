@@ -6,9 +6,9 @@ export default function PageLayout({ children, title, subtitle, headerRight , co
   return (
     <div
       style={{
-        paddingTop: "40px",
+        paddingTop: "50px",
         overflowY: "auto",
-        maxHeight: "calc(100vh - 70px)",
+        maxHeight: "calc(100vh - 50px)",
         paddingLeft: compact ? "0.0rem" : "0.0rem",
         paddingRight: compact ? "0.0rem" : "0.0rem",
         fontSize: compact ? "0.8rem" : "0.9rem",

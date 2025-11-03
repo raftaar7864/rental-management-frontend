@@ -222,7 +222,7 @@ export default function AdminBills() {
       <Row className="align-items-center mb-3">
         <Col>
           <motion.h3 initial={{ y: -6, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-            Generated Bills
+            Lists of Generated Bills
           </motion.h3>
         </Col>
 

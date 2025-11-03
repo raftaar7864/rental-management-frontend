@@ -6,9 +6,13 @@ import { motion } from "framer-motion";
 import { FaSignOutAlt, FaSignInAlt, FaUserCircle, FaBars } from "react-icons/fa";
 
 export default function NavBar({ user: propUser, onLogout: propLogout }) {
-  const ctx = useContext(AuthContext) || {};
-  const user = propUser ?? ctx.user;
-  const logout = propLogout ?? ctx.logout ?? (() => {});
+  const ctx = useContext(AuthContext);
+
+  // robust user detection (prefer propUser, then ctx.user, then ctx if it looks like a user)
+  const contextUser = ctx && (ctx.user ?? (ctx.name || ctx.fullName || ctx.email ? ctx : null));
+  const user = propUser ?? contextUser ?? null;
+  const logout = propLogout ?? (ctx && ctx.logout) ?? (() => {});
+
   const [showMobile, setShowMobile] = useState(false);
   const location = useLocation();
 
@@ -27,13 +31,24 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
   const managerLinks = [
     { name: "Dashboard", path: "/manager/dashboard" },
     { name: "Rooms", path: "/manager/rooms" },
-    { name: "Generate Bill", path: "/manager/generate-bill" },
     { name: "Tenants", path: "/manager/tenants" },
+    { name: "Generate Bill", path: "/manager/generate-bill" },
+  ];
+  const publicLinks = [
+    { name: "About Us", path: "/about" },
+    { name: "Refund Policy", path: "/refund-policy" },
+    { name: "Contact Us", path: "/contact" },
+    { name: "Privacy Policy", path: "/privacy" },
   ];
 
-  const navLinks = user?.role === "admin" ? adminLinks : managerLinks;
+  // choose links: logged-in users get role-specific links, otherwise public links
+  const navLinks = user
+    ? ((user?.role || "").toLowerCase() === "admin" ? adminLinks : managerLinks)
+    : publicLinks;
+
   const isActive = (path) => location.pathname === path;
-  const roleColor = user?.role === "admin" ? "danger" : "success";
+  // pick a color name for badges/buttons; default to 'primary' for public (no user)
+  const roleColor = user?.role === "admin" ? "danger" : (user ? "success" : "primary");
 
   return (
     <Navbar bg="light" expand="lg" className="shadow-sm" fixed="top" style={{ height: 72 }}>
@@ -51,7 +66,7 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
             <motion.div
               whileHover={{ rotate: 15 }}
               className="rounded-circle text-white px-3 py-2 fw-bold"
-              style={{ backgroundColor: roleColor === "danger" ? "#dc3545" : "#198754" }}
+              style={{ backgroundColor: roleColor === "danger" ? "#dc3545" : (roleColor === "success" ? "#198754" : "#0d6efd") }}
             >
               RM
             </motion.div>
@@ -62,33 +77,34 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
           </Navbar.Brand>
         </div>
 
+        {/* Desktop: always render navLinks; show profile or sign-in on the right */}
         <div className="d-none d-lg-flex ms-auto align-items-center gap-3">
+          <Nav className="d-flex align-items-center gap-2">
+            {navLinks.map((link) => (
+              <Nav.Link
+                as={Link}
+                to={link.path}
+                key={link.path}
+                className={`px-3 ${isActive(link.path) ? `text-${roleColor} fw-bold` : "text-dark"}`}
+              >
+                {link.name}
+                {isActive(link.path) && (
+                  <div
+                    style={{
+                      height: 3,
+                      width: "60%",
+                      background: roleColor === "danger" ? "#dc3545" : (roleColor === "success" ? "#198754" : "#0d6efd"),
+                      borderRadius: 999,
+                      marginTop: 6,
+                    }}
+                  />
+                )}
+              </Nav.Link>
+            ))}
+          </Nav>
+
           {user ? (
             <>
-              <Nav className="d-flex align-items-center gap-2">
-                {navLinks.map((link) => (
-                  <Nav.Link
-                    as={Link}
-                    to={link.path}
-                    key={link.path}
-                    className={`px-3 ${isActive(link.path) ? `text-${roleColor} fw-bold` : "text-dark"}`}
-                  >
-                    {link.name}
-                    {isActive(link.path) && (
-                      <div
-                        style={{
-                          height: 3,
-                          width: "60%",
-                          background: roleColor === "danger" ? "#dc3545" : "#198754",
-                          borderRadius: 999,
-                          marginTop: 6,
-                        }}
-                      />
-                    )}
-                  </Nav.Link>
-                ))}
-              </Nav>
-
               {/* Profile Dropdown */}
               <Dropdown align="end" className="ms-2">
                 <Dropdown.Toggle
@@ -99,7 +115,6 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
                 >
                   <FaUserCircle size={28} className="text-secondary" />
                   <div className="d-none d-md-block text-end">
-
                     <Badge bg={roleColor} className="text-uppercase">{user.role}</Badge>
                   </div>
                 </Dropdown.Toggle>
@@ -120,8 +135,6 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
-
-              {/* Keep separate Sign Out button visible as requested */}
             </>
           ) : (
             <Button as={Link} to="/login" variant="primary" className="d-flex align-items-center gap-2">
@@ -146,22 +159,26 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="flex-column">
+              {/* Mobile: always show navLinks */}
+              <div className="mb-3">
+                {navLinks.map((link) => (
+                  <Nav.Link
+                    as={Link}
+                    to={link.path}
+                    key={link.path}
+                    onClick={handleClose}
+                    className={`mb-2 ${isActive(link.path) ? `text-${roleColor} fw-bold` : "text-dark"}`}
+                  >
+                    {link.name}
+                  </Nav.Link>
+                ))}
+              </div>
+
               {user ? (
                 <>
                   <Badge bg={roleColor} className="align-self-start mb-3 text-uppercase">
                     {user.role}
                   </Badge>
-                  {navLinks.map((link) => (
-                    <Nav.Link
-                      as={Link}
-                      to={link.path}
-                      key={link.path}
-                      onClick={handleClose}
-                      className={`mb-2 ${isActive(link.path) ? `text-${roleColor} fw-bold` : "text-dark"}`}
-                    >
-                      {link.name}
-                    </Nav.Link>
-                  ))}
 
                   <div className="mt-3">
                     <Button as={Link} to={`/${user?.role}/profile`} variant="outline-secondary" className="w-100 mb-2" onClick={handleClose}>

@@ -386,8 +386,88 @@ const onTenantFormSuccess = async () => {
     return remaining > 0 ? `${firstTwo} + ${remaining} more` : firstTwo;
   };
 
+
+  // ---------- EXPORT TO EXCEL (exceljs via dynamic import) ----------
+  const exportToExcel = async (rows = []) => {
+    if (!rows || !rows.length) {
+      toast.info("No tenants to export");
+      return;
+    }
+
+    let ExcelJS;
+    try {
+      // try browser bundle first - more Vite friendly
+      const mod = await import("exceljs/dist/exceljs.min.js").catch(() => null);
+      if (mod) ExcelJS = mod && mod.default ? mod.default : mod;
+      else {
+        const mod2 = await import("exceljs");
+        ExcelJS = mod2 && mod2.default ? mod2.default : mod2;
+      }
+    } catch (err) {
+      console.error("Failed to load exceljs:", err);
+      toast.error("Export failed: exceljs not available");
+      return;
+    }
+
+    try {
+      const wb = new ExcelJS.Workbook();
+      wb.creator = "Rental Manager";
+      wb.created = new Date();
+      const ws = wb.addWorksheet("Tenants");
+
+      ws.columns = [
+        { header: "#", key: "idx", width: 6 },
+        { header: "Name", key: "name", width: 30 },
+        { header: "Tenant ID", key: "tenantId", width: 16 },
+        { header: "Phone", key: "phone", width: 14 },
+        { header: "Building", key: "building", width: 20 },
+        { header: "Room", key: "room", width: 12 },
+        { header: "Status", key: "status", width: 10 },
+        { header: "MoveIn", key: "moveIn", width: 16 },
+        { header: "MoveOut", key: "moveOut", width: 16 },
+        { header: "Rent", key: "rent", width: 12 },
+      ];
+
+      rows.forEach((t, i) => {
+        ws.addRow({
+          idx: i + 1,
+          name: t.fullName || "-",
+          tenantId: t.tenantId || "-",
+          phone: t.phone || "-",
+          building: t.room?.building?.name || "-",
+          room: t.room?.number || t.roomId || "-",
+          status: t.moveOutDate ? "Left" : "Active",
+          moveIn: t.moveInDate ? new Date(t.moveInDate).toLocaleDateString() : "",
+          moveOut: t.moveOutDate ? new Date(t.moveOutDate).toLocaleDateString() : "",
+          rent: t.rentAmount ?? t.rent ?? t.monthlyRent ?? "",
+        });
+      });
+
+      ws.getRow(1).font = { bold: true };
+      ws.autoFilter = { from: "A1", to: "J1" };
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `tenants_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Exported tenants to Excel");
+    } catch (err) {
+      console.error("Excel export error:", err);
+      toast.error("Failed to export Excel");
+    }
+  };
+  // -------------------------------------------------------------------
+
+
   return (
-    <Container className="py-2">
+    <Container fluid className="page-container">
       <Row className="mb-3 align-items-center">
         <Col>
           <h3 className="mb-0">Tenants — {buildingDisplay()}</h3>
@@ -406,21 +486,24 @@ const onTenantFormSuccess = async () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ paddingLeft: 36, borderRadius: 10 }}
               /></div>
-                          <Button
-                            variant="outline-secondary"
-                            onClick={() => {
-                              setSearchTerm("");
-                              if (searchRef.current) searchRef.current.value = "";
-                            }}
-                          >
-                            Clear
-                          </Button>
+                <Button
+                  variant="outline-secondary"
+                  onClick={() => {
+                    setSearchTerm("");
+                    if (searchRef.current) searchRef.current.value = "";
+                  }}
+                >
+                  Clear
+                </Button>
+                <Button variant="outline-primary" className="me-1" onClick={() => exportToExcel(filteredTenants)}>
+                    📥 Export
+              </Button>
             
          </div>
         </Col>
       </Row>
-
-      <Card className="mb-3">
+    <div className="page-content">
+      <Card className="tenants-card">
         <Card.Body>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
@@ -469,7 +552,7 @@ const onTenantFormSuccess = async () => {
  
             </div>
           </div>
-
+        <div className="inner-scroll">
           {loadingTenants ? (
             <div className="text-center py-4"><Spinner /></div>
           ) : tenants.length === 0 ? (
@@ -485,9 +568,10 @@ const onTenantFormSuccess = async () => {
               ))}
             </Row>
           )}
+          </div>
         </Card.Body>
       </Card>
-
+    </div>
       {/* Quick Add modal */}
       <Modal show={showQuickAdd} onHide={() => setShowQuickAdd(false)} centered>
         <Modal.Header closeButton>

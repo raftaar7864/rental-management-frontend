@@ -27,6 +27,10 @@ html, body, #root {
   background-color: var(--bg);
   font-size: 0.9rem;
   color: #111827;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 1px;
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Full-height page container for dashboards/pages */
@@ -35,7 +39,7 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 12px;
+  padding: 1px;
   box-sizing: border-box;
   background-color: transparent;
 }
@@ -59,14 +63,34 @@ html, body, #root {
   height: 100%;
   padding: 1rem;
 }
-.rooms-scroll {
+.inner-scroll {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-top: 6px;
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar visually (Chrome, Edge, Safari) */
+.inner-scroll::-webkit-scrollbar {
+  display: none;
 }
 .search-input { max-width: 420px; width: 100%; min-width: 0; }
 .room-col > .card { height: 100%; }
+.tenant-col > .card { height: 100%; }
+
+.tenants-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.tenants-card .card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+}
 
 /* ---------- Global UI tweaks & accessibility ---------- */
 .container, .card, .table, .form-control, .btn { font-size: 0.9rem !important; }
@@ -303,3 +327,24 @@ html, body, #root {
 }
 .content-padding { padding-left: 12px; padding-right: 12px; box-sizing: border-box; }
 .fullwidth-card { width: calc(100% - 24px); margin: 0; box-sizing: border-box; }
+
+/* ---------- Hide all scrollbars globally (applied) ----------
+   This removes visible scrollbars everywhere and disables native page scrolling.
+   If you later prefer invisible scrollbars but keep scrolling, change `overflow-y` to `auto`
+   on html/body instead of `hidden`.
+-------------------------------------------------------------- */
+* {
+  scrollbar-width: none !important; /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none !important; /* Chrome, Edge, Safari */
+}
+
+/* Prevent native page scroll (no vertical or horizontal page scroll visible or usable) */
+html, body {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+

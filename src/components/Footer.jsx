@@ -13,7 +13,7 @@ export default function Footer() {
       className={`bg-light text-center text-muted border-top fixed-bottom shadow-sm`}
       style={{
         fontSize: "0.9rem",
-        height: "56px",
+        height: "50px",
         zIndex: 1020,
       }}
     >

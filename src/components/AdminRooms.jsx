@@ -1,6 +1,5 @@
-// src/pages/AdminRooms.jsx
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { getBuildings } from "../services/BuildingService";
 import {
   getAllRooms,
@@ -82,6 +81,7 @@ const RoomCard = ({
     : { backgroundColor: "#e8f8ef", border: "1px solid #b4e2c1", color: "#146c43" };
 
   return (
+
     <Card
       className="h-100 shadow-sm border-0"
       style={{
@@ -189,7 +189,7 @@ const RoomCard = ({
               <div className="fw-medium text-truncate">{phone}</div>
             </div>
             <Badge bg="dark" text="light" className="border">
-              Rent:{" "}
+              Rent: {" "}
               <span className="fw-medium ms-1">{formattedRent(r, t)}</span>
             </Badge>
           </div>
@@ -233,11 +233,12 @@ const AdminRooms = () => {
       setBuildings(res.data || []);
     } catch { toast.error("Failed to load buildings"); }
   };
-  const fetchAllRooms = async () => {
+  const fetchAllRooms = async (notify = false) => {
     try {
       setLoading(true);
       const res = await getAllRooms();
       setRooms(res.data || []);
+      if (notify) toast.success("Rooms loaded");
     } catch { toast.error("Failed to load rooms"); }
     finally { setLoading(false); }
   };
@@ -311,11 +312,14 @@ const AdminRooms = () => {
       else return toast.error("Choose building");
       await fetchAllRooms();
       setShowRoomModal(false);
+      toast.success(editingRoomId ? "Room updated" : "Room added");
     } catch { toast.error("Failed to save room"); }
   };
 
   return (
     <Container fluid className="page-container">
+      <ToastContainer position="top-right" autoClose={2500} hideProgressBar theme="colored" />
+
       {/* Header - fixed size */}
       <div className="page-header d-flex justify-content-between flex-wrap align-items-start mb-2">
         <div>
@@ -372,14 +376,14 @@ const AdminRooms = () => {
                     {f.charAt(0).toUpperCase() + f.slice(1)}
                   </ToggleButton>
                 ))}
-                <Button variant="outline-secondary" className="ms-2" onClick={fetchAllRooms}>
+                <Button variant="outline-secondary" className="ms-2" onClick={() => fetchAllRooms(true)}>
                   <RefreshCw size={16} className="me-1" />
                 </Button>
               </ButtonGroup>
             </div>
 
             {/* Scrollable area for rooms grid */}
-            <div className="rooms-scroll">
+            <div className="inner-scroll">
               {loading ? (
                 <div className="text-center py-4"><Spinner /></div>
               ) : filteredRooms.length === 0 ? (
@@ -469,6 +473,7 @@ const AdminRooms = () => {
       </Modal>
     </Container>
   );
+  
 };
 
 export default AdminRooms;

@@ -421,25 +421,28 @@ const AdminTenants = () => {
 
 
   return (
-    <Container className="py-2">
+    <Container fluid className="page-container">
+      
       {/* Header */}
-      <Row className="mb-3 align-items-center">
-        <Col>
-          <div>
-            <h3 className="mb-0">Tenant Management</h3>
+      <div className="page-header d-flex justify-content-between flex-wrap align-items-start mb-2">
+        <div>
+            <h3 className="mb-1">Tenant Management</h3>
             <div className="text-muted small">Click a card to view full tenant details</div>
           </div>
-        </Col>
 
-        <Col className="text-end">
-          <div className="d-flex justify-content-end gap-2 align-items-center">
-            {/* Search */}
-            <div className="position-relative me-2" style={{ width: 280 }}>
-              <Search
-                size={16}
-                className="position-absolute text-muted"
-                style={{ top: "50%", left: 10, transform: "translateY(-50%)" }}
-              />
+        <div className="d-flex gap-2 align-items-center mt-2">
+          <InputGroup style={{ width: 360 }} className="search-input">
+            <div
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 2,
+              }}
+              >
+              <Search size={16} className="text-muted" />
+            </div>
               <Form.Control
                 placeholder="Search by name, ID or phone"
                 value={search}
@@ -448,31 +451,30 @@ const AdminTenants = () => {
                 aria-label="Search tenants"
                 style={{ paddingLeft: 36, borderRadius: 10 }}
               />
-            </div>
-                        <Button variant="outline-secondary" onClick={() => { setSearch(""); setDebouncedSearch(""); }}>
-                          Clear
-                        </Button>
+                <Button variant="outline-secondary" onClick={() => { setSearch(""); setDebouncedSearch(""); }}>
+                  Clear
+                </Button>
+                </InputGroup>
 
             {/* Quick Add / Export / Add */}
                <Button variant="outline-primary" className="me-1" onClick={() => exportToExcel(filteredTenants)}>
               📥 Export
             </Button>
           </div>
-        </Col>
-      </Row>
+      </div>
 
       {/* Controls & summary card */}
-      <Card className="mb-3">
+      <div className="page-content">
+       <Card className="tenants-card">
         <Card.Body>
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
             <div>
               <strong>Tenants</strong>
               <div className="small text-muted">{shownCount} / {totalCount} shown</div>
             </div>
-
-            <div className="d-flex align-items-center gap-2">
               {/* Status toggles */}
-              <ButtonGroup size="sm" className="me-2" aria-label="Filter tenants by status">
+              <div className="d-flex align-items-center gap-2">
+              <ButtonGroup>
                 <ToggleButton
                   id="status-all"
                   type="radio"
@@ -505,37 +507,27 @@ const AdminTenants = () => {
                   onChange={() => setStatusFilter("left")}
                 >
                   Left
-                </ToggleButton>
-              </ButtonGroup>
+                </ToggleButton></ButtonGroup>
 
-              {/* View toggle */}
-            <Button variant="secondary" className="me-1" onClick={openQuickAdd} disabled={!buildings.length}>
-              Quick Add
-            </Button>
-
+              <Button variant="secondary" className="me-1" onClick={openQuickAdd} disabled={!buildings.length}>
+                 Quick Add
+              </Button>
             <Button variant="primary" onClick={openAddTenant}>
               <UserRoundPlus size ="16"/> Tenant
-            </Button>
+            </Button>  
             </div>
           </div>
-        </Card.Body>
-      </Card>
 
-      {/* Content */}
-      <Card className="mb-3">
-        <Card.Body>
+          <div className="inner-scroll">
           {loading ? (
-            <div className="d-flex justify-content-center py-5">
-              <Spinner animation="border" />
-            </div>
-          ) : tenants.length === 0 ? (
-            <p className="text-muted">No tenants found. Add one using the 'Add Tenant' button.</p>
-          ) : filteredTenants.length === 0 ? (
-            <p className="text-muted">No tenants match your filters.</p>
-          ) : viewMode === "grid" ? (
+          <div className="text-center py-4"><Spinner /></div>
+            
+          ) :  filteredTenants.length === 0 ? (
+            <div className="text-center text-muted py-4">No tenants found</div>
+          ) : (
             <Row xs={1} sm={1} md={2} lg={3} className="g-3">
               {filteredTenants.map((t) => (
-                <Col key={t._id}>
+                <Col key={t._id} className="tenant-col">
                   <TenantCard
                     tenant={t}
                     viewMode="grid"
@@ -547,24 +539,11 @@ const AdminTenants = () => {
                 </Col>
               ))}
             </Row>
-          ) : (
-            <div className="d-flex flex-column gap-3">
-              {filteredTenants.map((t) => (
-                <div key={t._id}>
-                  <TenantCard
-                    tenant={t}
-                    viewMode="list"
-                    onView={handleViewTenant}
-                    onEdit={openEditTenant}
-                    onDelete={handleDelete}
-                    onMarkLeave={startMarkLeave}
-                  />
-                </div>
-              ))}
-            </div>
           )}
+          </div>
         </Card.Body>
       </Card>
+      </div>
       {/* Tenant Form modal */}
       {showTenantForm && (
         <TenantForm
