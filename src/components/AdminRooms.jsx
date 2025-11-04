@@ -238,7 +238,6 @@ const AdminRooms = () => {
       setLoading(true);
       const res = await getAllRooms();
       setRooms(res.data || []);
-      if (notify) toast.success("Rooms loaded");
     } catch { toast.error("Failed to load rooms"); }
     finally { setLoading(false); }
   };
