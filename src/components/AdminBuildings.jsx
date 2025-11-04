@@ -275,7 +275,7 @@ const AdminBuildings = () => {
           </Button>
           </div>
           <div className="small text-muted">
-            {loading || loadingRooms ? : null}
+            {loading || loadingRooms}
           </div>
         </Card.Body>
       </Card>
