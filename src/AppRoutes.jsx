@@ -66,14 +66,14 @@ const AppRoutes = () => {
         element={
           <PageLayout>
             <ProtectedRoute roles={["manager"]}>
-
+              <Routes>
                 <Route path="dashboard" element={<ManagerDashboard />} />
                 <Route path="buildings" element={<ManagerBuildings />} />
                 <Route path="rooms" element={<ManagerRooms />} />
                 <Route path="tenants" element={<ManagerTenants />} />
                 <Route path="generate-bill" element={<GenerateBill />} />
                 <Route path="*" element={<Navigate to="/manager/dashboard" replace />} />
-
+              </Routes>
             </ProtectedRoute>
           </PageLayout>
         }
