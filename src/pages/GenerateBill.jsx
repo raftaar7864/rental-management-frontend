@@ -114,7 +114,7 @@ export default function GenerateBill() {
   const [currentBill, setCurrentBill] = useState(null);
 
   // NEW: send notifications checkbox state
-  const [sendNotifications, setSendNotifications] = useState(true);
+  const [sendNotifications, setSendNotifications] = useState(false);
 
   const prevValidMonth = useRef(selectedMonth);
   const { user } = useContext(AuthContext);
@@ -279,11 +279,11 @@ export default function GenerateBill() {
     setElectricity(0);
     setAdditionalAmount(0);
     setDiscount(0);
-    setIncludeProcessing(true);
+    setIncludeProcessing(false);
     setNotes("");
     setPaymentLink("");
     setCurrentBill(null);
-    setSendNotifications(true); // default to true when opening
+    setSendNotifications(false); // default to true when opening
     setShowModal(true);
 
     if (room.billId) {
@@ -564,7 +564,7 @@ export default function GenerateBill() {
                         {Array.isArray(buildings) &&
                           buildings.map((b) => (
                             <option key={b._id || b.id} value={b._id || b.id}>
-                              {b.name} {b.address ? `- ${b.address}` : ""}
+                              {b.name? b.name : ""}
                             </option>
                           ))}
                       </Form.Select>
@@ -841,15 +841,15 @@ export default function GenerateBill() {
               </Row>
 
               <Row className="mt-3 g-3">
-                <Col md={6}>
-                  <Form.Check
+                 <Col md={6}>
+               {/*  <Form.Check
                     type="checkbox"
                     label={`Include Processing Fee (2%) - ${formatCurrency(Math.round(getTenantRent() * 0.02))}`}
                     checked={includeProcessing}
                     onChange={(e) => setIncludeProcessing(e.target.checked)}
                     disabled={modalMode === "view"}
-                  />
-                </Col>
+                  />*/}
+                </Col> 
 
                 <Col md={6} className="text-end">
                   <div className="text-muted">Rent basis: {selectedTenantForModal?.proratedRent ? "Prorated" : (selectedTenantForModal?.rentAmount ? "Tenant Rent" : "Room Rent")}</div>
