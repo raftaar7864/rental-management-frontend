@@ -431,7 +431,7 @@ const AdminTenants = () => {
           </div>
 
         <div className="d-flex gap-2 align-items-center mt-2">
-          <InputGroup style={{ width: 360 }} className="search-input">
+          <InputGroup style={{ width: 320 }} className="search-input">
             <div
               style={{
                 position: "absolute",
