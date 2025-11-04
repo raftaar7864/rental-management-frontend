@@ -275,7 +275,7 @@ const AdminBuildings = () => {
           </Button>
           </div>
           <div className="small text-muted">
-            {loading || loadingRooms ? <Spinner animation="border" size="sm" /> : null}
+            {loading || loadingRooms ? : null}
           </div>
         </Card.Body>
       </Card>
