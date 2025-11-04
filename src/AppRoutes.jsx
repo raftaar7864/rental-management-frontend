@@ -25,6 +25,13 @@ import ManagerTenants from "./components/ManagerTenants";
 import TenantBills from "./pages/TenantBills";
 import TenantPayment from "./pages/TenantPayment";
 
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RefundPolicy from "./pages/RefundPolicy";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import { Router } from "lucide-react";
+
+
 
 const AppRoutes = () => {
   return (
@@ -59,14 +66,14 @@ const AppRoutes = () => {
         element={
           <PageLayout>
             <ProtectedRoute roles={["manager"]}>
-              <Routes>
+
                 <Route path="dashboard" element={<ManagerDashboard />} />
                 <Route path="buildings" element={<ManagerBuildings />} />
                 <Route path="rooms" element={<ManagerRooms />} />
                 <Route path="tenants" element={<ManagerTenants />} />
                 <Route path="generate-bill" element={<GenerateBill />} />
                 <Route path="*" element={<Navigate to="/manager/dashboard" replace />} />
-              </Routes>
+
             </ProtectedRoute>
           </PageLayout>
         }
@@ -91,13 +98,16 @@ const AppRoutes = () => {
       <Route path="/unauthorized" element={<PageLayout><Unauthorized /></PageLayout>} />
 
       {/* Root redirect */}
-      <Route path="/login" element={<PageLayout><Navigate to="/login" replace /></PageLayout>} />
+  
 
       <Route path="/payment/:billId" element={<PageLayout><PaymentProcessing /></PageLayout>} />
 
       <Route path="/payment/public/:billId" element={<TenantPayment />} />
 
-
+      <Route path="/privacy-policy" element={<PageLayout><PrivacyPolicy /></PageLayout>} />
+      <Route path="/refund-policy" element={<PageLayout><RefundPolicy /></PageLayout>} />
+      <Route path="/about" element={<PageLayout><AboutUs /></PageLayout>} />
+      <Route path="/contact" element={<PageLayout><ContactUs /></PageLayout>} />
 
       {/* Fallback 404 */}
       <Route path="*" element={<PageLayout><h3>404 - Not Found</h3></PageLayout>} />
