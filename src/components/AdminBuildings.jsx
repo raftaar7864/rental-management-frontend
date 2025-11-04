@@ -217,7 +217,7 @@ const AdminBuildings = () => {
         </div>
 
         <div className="d-flex gap-2 align-items-center mt-2">
-          <InputGroup style={{ width: 330 }}>
+          <InputGroup style={{ width: 320 }}>
             <div
               style={{
                 position: "absolute",
