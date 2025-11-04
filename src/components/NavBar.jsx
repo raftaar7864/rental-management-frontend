@@ -38,7 +38,7 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
     { name: "About Us", path: "/about" },
     { name: "Refund Policy", path: "/refund-policy" },
     { name: "Contact Us", path: "/contact" },
-    { name: "Privacy Policy", path: "/privacy" },
+    { name: "Privacy Policy", path: "/privacy-policy" },
   ];
 
   // choose links: logged-in users get role-specific links, otherwise public links
