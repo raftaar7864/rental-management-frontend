@@ -93,9 +93,10 @@ const ContactUs = () => {
           📧 <strong>Email:</strong> bank@drbiswasgroup.com<br />
           📞 <strong>Phone:</strong> +91-99xxxxxxxx<br />
         </p>
-      <ToastContainer position="top-right" autoClose={2500} />
+      <ToastContainer position="top-right" autoClose={5500} />
     </Container>
   );
 };
 
 export default ContactUs;
+
