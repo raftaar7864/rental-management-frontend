@@ -97,7 +97,6 @@ const ContactUs = () => {
         <hr className="my-4" />
         <p>
           📧 <strong>Email:</strong> bank@drbiswasgroup.com<br />
-          📞 <strong>Phone:</strong> +91-99xxxxxxxx<br />
         </p>
       <ToastContainer position="top-right" autoClose={2500} />
     </Container>
@@ -105,3 +104,4 @@ const ContactUs = () => {
 };
 
 export default ContactUs;
+
