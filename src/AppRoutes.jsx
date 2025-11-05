@@ -29,7 +29,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
-import { Router } from "lucide-react";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 
 
@@ -108,6 +108,7 @@ const AppRoutes = () => {
       <Route path="/refund-policy" element={<PageLayout><RefundPolicy /></PageLayout>} />
       <Route path="/about" element={<PageLayout><AboutUs /></PageLayout>} />
       <Route path="/contact" element={<PageLayout><ContactUs /></PageLayout>} />
+      <Route path="/terms-and-conditions" element={<PageLayout><TermsAndConditions /></PageLayout>} />
 
       {/* Fallback 404 */}
       <Route path="*" element={<PageLayout><h3>404 - Not Found</h3></PageLayout>} />
