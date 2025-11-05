@@ -24,12 +24,10 @@ export default function TenantBills() {
   const [currentBill, setCurrentBill] = useState(null);
 
   async function fetchBills() {
-    //if (!tenantId.trim()) return alert("Please enter your Tenant ID (e.g. T001 or 001)");
     setLoading(true);
     setSearched(true);
     setCurrentBill(null);
     try {
-      // ✅ Normalize tenant ID (allow "T001" or "001")
       let normalizedId = tenantId.trim().toUpperCase();
       if (!normalizedId.startsWith("T")) {
         normalizedId = `T${normalizedId}`;
@@ -56,7 +54,6 @@ export default function TenantBills() {
     }
   }
 
-
   async function downloadPdf(billId) {
     try {
       const blob = await BillService.getBillPdf(billId);
@@ -74,8 +71,11 @@ export default function TenantBills() {
     }
   }
 
-
   const navigate = useNavigate();
+
+  // only show the last two previous bills (i.e., bills[1] and bills[2] if present)
+  const previousBills = bills.length > 1 ? bills.slice(1, 4) : [];
+
   return (
     <div style={{ background: "#f4f7fb", minHeight: "100vh", paddingTop: "60px" }}>
       <Container className="pb-5 text-center">
@@ -86,11 +86,11 @@ export default function TenantBills() {
           transition={{ duration: 0.6 }}
           className="mb-4"
         >
-         <img
+          <img
             src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGozdHRpMTA5dGo5a2swODg2N25xNG53cmtmcHR1ZTdvZG50Z3hicSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/L2BSJXbYiZlXSUKQGY/giphy.gif"
             alt="Tenant Dashboard"
             style={{ width: 100, marginBottom: 10 }}
-          /> 
+          />
           <h2 className="fw-bold text-primary">
             <Home size={24} className="me-2" />
             Tenant Billing Portal
@@ -179,33 +179,31 @@ export default function TenantBills() {
                         {currentBill.building?.name || "Building"} — Room{" "}
                         {currentBill.room?.number || "N/A"}
                       </p>
-                        <p className="text-muted mb-2">
-                          <User size={14} className="me-1" />
-                          {currentBill.tenant?.fullName ||
-                            currentBill.tenantName ||
-                            "Tenant Name Not Available"}
-                        </p>
-                        <p className="text-muted mb-2">
-                          <Badge bg="secondary">
-                            ID: {currentBill.tenant?.tenantId || tenantId || "N/A"}
-                          </Badge>
-                        </p>
-                          {currentBill.paymentStatus === "Paid" && (
-                            <>
-                              <p className="text-muted mb-1">
-                                <strong>Paid Date:</strong>{" "}
-                                {currentBill.payment?.paidAt
-                                  ? new Date(currentBill.payment.paidAt).toLocaleString()
-                                  : "N/A"}
-                              </p>
-                              <p className="text-muted mb-2">
-                                <strong>Reference ID:</strong>{" "}
-                                {currentBill.payment?.reference || currentBill.paymentRef || "N/A"}
-                              </p>
-                            </>
-                          )}
-
-
+                      <p className="text-muted mb-2">
+                        <User size={14} className="me-1" />
+                        {currentBill.tenant?.fullName ||
+                          currentBill.tenantName ||
+                          "Tenant Name Not Available"}
+                      </p>
+                      <p className="text-muted mb-2">
+                        <Badge bg="secondary">
+                          ID: {currentBill.tenant?.tenantId || tenantId || "N/A"}
+                        </Badge>
+                      </p>
+                      {currentBill.paymentStatus === "Paid" && (
+                        <>
+                          <p className="text-muted mb-1">
+                            <strong>Paid Date:</strong>{" "}
+                            {currentBill.payment?.paidAt
+                              ? new Date(currentBill.payment.paidAt).toLocaleString()
+                              : "N/A"}
+                          </p>
+                          <p className="text-muted mb-2">
+                            <strong>Reference ID:</strong>{" "}
+                            {currentBill.payment?.reference || currentBill.paymentRef || "N/A"}
+                          </p>
+                        </>
+                      )}
                     </Col>
                     <Col
                       sm={4}
@@ -222,7 +220,6 @@ export default function TenantBills() {
                           {currentBill.paymentStatus || "Pending"}
                         </Badge>
 
-                        {/* ✅ Paid Date and Reference ID (only if available) */}
                         {currentBill.paymentStatus === "Paid" && (
                           <>
                             {currentBill.paidDate && (
@@ -239,7 +236,7 @@ export default function TenantBills() {
                         )}
                       </div>
 
-                      {/* ✅ Action Buttons - PDF on left, Pay Now on right */}
+                      {/* Action Buttons - PDF + Pay Now (if unpaid) */}
                       <div className="d-flex justify-content-end mt-2">
                         <Button
                           variant="outline-secondary"
@@ -259,15 +256,14 @@ export default function TenantBills() {
                         )}
                       </div>
                     </Col>
-
-                    </Row>
+                  </Row>
                 </Card>
               ) : (
                 <p className="text-muted">No current bill found.</p>
               )}
 
-              {/* Previous Bills */}
-              {bills.length > 1 && (
+              {/* Previous Bills (last two only) */}
+              {previousBills.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -278,7 +274,8 @@ export default function TenantBills() {
                   <h5 className="text-primary fw-bold mb-3">
                     <Clock size={18} className="me-2" /> Previous Payment History
                   </h5>
-                  {bills.slice(1).map((bill) => (
+
+                  {previousBills.map((bill) => (
                     <Card
                       key={bill._id}
                       className="shadow-sm border-0 p-3 mb-3 rounded-3 hover-shadow"
@@ -307,15 +304,13 @@ export default function TenantBills() {
                             {bill.building?.name || "Building"} — Room{" "}
                             {bill.room?.number || "N/A"}
                           </p>
-                                                  <p className="text-muted mb-2">
-                          <User size={14} className="me-1" />
-                          {currentBill.tenant?.fullName ||
-                            currentBill.tenantName ||
-                            "Tenant Name Not Available"}
-                          <Badge bg="secondary">
-                            ID: {currentBill.tenant?.tenantId || tenantId || "N/A"}
-                          </Badge>
-                        </p>
+                          <p className="text-muted mb-2">
+                            <User size={14} className="me-1" />
+                            {bill.tenant?.fullName || bill.tenantName || "Tenant Name Not Available"}
+                            <Badge bg="secondary" className="ms-2">
+                              ID: {bill.tenant?.tenantId || tenantId || "N/A"}
+                            </Badge>
+                          </p>
                           <p className="mb-0">
                             ₹{Number(bill.totalAmount).toFixed(0)} —{" "}
                             {bill.paymentStatus === "Paid" ? (
@@ -334,19 +329,31 @@ export default function TenantBills() {
                               | Ref: {bill.payment?.reference || bill.paymentRef || "N/A"}
                             </small>
                           )}
-
                         </Col>
                         <Col
                           sm={4}
                           className="d-flex justify-content-end align-items-center"
                         >
+                          {/* Always show PDF */}
                           <Button
                             variant="outline-secondary"
                             size="sm"
+                            className="me-2"
                             onClick={() => downloadPdf(bill._id)}
                           >
                             <FileText size={14} className="me-1" /> PDF
                           </Button>
+
+                          {/* Show Pay Now only if NOT paid */}
+                          {bill.paymentStatus !== "Paid" && (
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() => navigate(`/payment/public/${bill._id}`)}
+                            >
+                              <CreditCard size={14} className="me-1" /> Pay Now
+                            </Button>
+                          )}
                         </Col>
                       </Row>
                     </Card>
