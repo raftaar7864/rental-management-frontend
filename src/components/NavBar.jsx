@@ -194,11 +194,11 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
             >
               RM
             </motion.div>
-            <div style={{ marginLeft: 8 }}>
+            <div style={{ marginLeft: 1 }}>
               <div>Rent Collection Manager</div>
               <small className="text-muted d-none d-sm-block">{import.meta.env.VITE_COMPANY_NAME}</small>
             </div>            {/* Animated clipart cluster */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
               <BuildingIcon delay={0} />
               <KeyIcon delay={0.18} />
               <CoinIcon delay={0.36} />
