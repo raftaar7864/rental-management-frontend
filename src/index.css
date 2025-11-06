@@ -347,4 +347,36 @@ html, body {
   overflow-y: hidden !important;
 }
 
+.golden-shimmer {
+  background: linear-gradient(
+    90deg,
+    #6b4e00,
+    #b8860b,
+    #ffd700,
+    #fff8dc,
+    #b8860b,
+    #6b4e00
+  );
+  background-size: 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 2.8s linear infinite;
+  text-shadow:
+    0 0 8px rgba(255, 215, 0, 0.4),
+    0 0 15px rgba(255, 223, 80, 0.3),
+    0 0 25px rgba(255, 240, 120, 0.25);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
