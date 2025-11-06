@@ -146,9 +146,6 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
   ];
   const publicLinks = [
     { name: "About Us", path: "/about" },
-    { name: "Refund Policy", path: "/refund-policy" },
-    { name: "Terms & Conditions", path: "/terms-and-conditions" },
-    { name: "Privacy Policy", path: "/privacy-policy" },
     { name: "Contact Us", path: "/contact" },
   ];
 
