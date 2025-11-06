@@ -165,7 +165,7 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
   const roleHex = roleColor === "danger" ? "#dc3545" : (roleColor === "success" ? "#198754" : "#0d6efd");
 
   return (
-    <Navbar bg="light" expand="lg" className="shadow-sm" fixed="top" style={{ height: 72 }}>
+    <Navbar bg="light" expand="lg" className="shadow-sm" fixed="top" style={{ height: 70 }}>
       <Container fluid>
         <div className="d-flex align-items-center gap-2">
           <Button
@@ -189,22 +189,18 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 300 }}
               className="rounded-circle text-white px-3 py-2 fw-bold d-flex align-items-center justify-content-center"
-              style={{ backgroundColor: roleHex, minWidth: 44, minHeight: 44 }}
               aria-hidden
             >
-              RM
+              <img src="https://pub-06b02bc70d584ecab7ff7b2f8384dc0e.r2.dev/assets/logo.png" height={30}></img>
             </motion.div>
-
-            {/* Animated clipart cluster */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ marginLeft: -25 }}>
+              <div>Rent Collection Manager</div>
+              <small className="text-muted d-none d-sm-block">{import.meta.env.VITE_COMPANY_NAME}</small>
+            </div>            {/* Animated clipart cluster */}
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <BuildingIcon delay={0} />
               <KeyIcon delay={0.18} />
               <CoinIcon delay={0.36} />
-            </div>
-
-            <div style={{ marginLeft: 8 }}>
-              <div>Rent Collection</div>
-              <small className="text-muted d-none d-sm-block">Buildings • Tenants • Payments</small>
             </div>
           </Navbar.Brand>
         </div>
