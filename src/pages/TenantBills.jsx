@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Card, Spinner, Row, Col, Badge } from "react-bootstrap";
 import BillService from "../services/BillService";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,6 +15,56 @@ import {
   Building2,
   Receipt,
 } from "lucide-react";
+
+// Simple Typewriter component (no external libraries)
+function Typewriter({ texts = [], speed = 60, pause = 1200, loop = true, className = "" }) {
+  const [index, setIndex] = useState(0); // which text
+  const [subIndex, setSubIndex] = useState(0); // how many chars
+  const [blink, setBlink] = useState(true);
+  const [reverse, setReverse] = useState(false);
+
+  useEffect(() => {
+    if (!texts.length) return;
+
+    // typing/erasing interval
+    const interval = setInterval(() => {
+      if (!reverse) {
+        // typing forward
+        if (subIndex < texts[index].length) {
+          setSubIndex((s) => s + 1);
+        } else {
+          // completed typing, pause then start erasing
+          setReverse(true);
+          clearInterval(interval);
+        }
+      } else {
+        // erasing
+        if (subIndex > 0) {
+          setSubIndex((s) => s - 1);
+        } else {
+          // erased, move to next
+          setReverse(false);
+          setIndex((i) => (i + 1) % texts.length);
+        }
+      }
+    }, reverse ? Math.max(30, speed / 2) : speed);
+
+    return () => clearInterval(interval);
+  }, [subIndex, index, reverse, texts, speed]);
+
+  // blink cursor
+  useEffect(() => {
+    const blinkInterval = setInterval(() => setBlink((b) => !b), 500);
+    return () => clearInterval(blinkInterval);
+  }, []);
+
+  return (
+    <span className={className}>
+      {texts.length ? texts[index].substring(0, subIndex) : ""}
+      <span style={{ opacity: blink ? 1 : 0 }}>|</span>
+    </span>
+  );
+}
 
 export default function TenantBills() {
   const [tenantId, setTenantId] = useState("");
@@ -76,9 +126,21 @@ export default function TenantBills() {
   // only show the last two previous bills (i.e., bills[1] and bills[2] if present)
   const previousBills = bills.length > 1 ? bills.slice(1, 4) : [];
 
+  // Typewriter texts about DB WELLNESS PRIVATE LIMITED
+  const introTexts = [
+    "DB WELLNESS PRIVATE LIMITED — Trusted rental & property management.",
+    "Secure billing, instant payments and tenant-first support.",
+    "Transparent records. Easy payments. Peace of mind for tenants and owners."
+  ];
+
   return (
     <div style={{ background: "#f4f7fb", minHeight: "100vh", paddingTop: "60px" }}>
       <Container className="pb-5 text-center">
+        
+          {/* Typewriter intro line */}
+          <p className="text-muted mb-0" style={{ minHeight: 24 }}>
+            <Typewriter texts={introTexts} speed={50} pause={1400} />
+          </p>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -87,7 +149,7 @@ export default function TenantBills() {
           className="mb-4"
         >
           <img
-            src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGozdHRpMTA5dGo5a2swODg2N25xNG53cmtmcHR1ZTdvZG50Z3hicSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/L2BSJXbYiZlXSUKQGY/giphy.gif"
+            src="https://pub-06b02bc70d584ecab7ff7b2f8384dc0e.r2.dev/assets/home.gif"
             alt="Tenant Dashboard"
             style={{ width: 100, marginBottom: 10 }}
           />
@@ -95,7 +157,9 @@ export default function TenantBills() {
             <Home size={24} className="me-2" />
             Tenant Billing Portal
           </h2>
-          <p className="text-muted mb-0">
+
+
+          <p className="text-muted mb-0 mt-2" style={{ fontSize: "0.95rem" }}>
             Enter your Tenant ID to view your bills and payment history.
           </p>
         </motion.div>
@@ -322,10 +386,10 @@ export default function TenantBills() {
                           </p>
                           {bill.paymentStatus === "Paid" && (
                             <small className="text-muted d-block mt-1">
-                              Paid:{" "}
+                              Paid: {" "}
                               {bill.payment?.paidAt
                                 ? new Date(bill.payment.paidAt).toLocaleString()
-                                : "N/A"}{" "}
+                                : "N/A"} {" "}
                               | Ref: {bill.payment?.reference || bill.paymentRef || "N/A"}
                             </small>
                           )}
