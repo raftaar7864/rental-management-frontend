@@ -143,7 +143,7 @@ export default function TenantBills() {
           style={{ 
             minHeight: 24, 
             fontWeight: "600",
-            fontSize: "1.0rem",
+            fontSize: "1.1rem",
             letterSpacing: "0.5px"
           }}
         >
@@ -443,9 +443,9 @@ export default function TenantBills() {
     padding: "25px 10px",
     textAlign: "center",
     color: "#6c757d",
-    fontSize: "0.75rem",
+    fontSize: "0.85rem",
     lineHeight: "1.6",
-    background: "linear-gradient(180deg, #faf9f5, #fffbea)",
+
     borderTop: "1px solid rgba(0,0,0,0.05)",
     animation: "fadeIn 1.5s ease-in",
   }}
@@ -456,7 +456,7 @@ export default function TenantBills() {
     Secure billing, instant payments and tenant-first support.
 
     Transparent records. Easy payments. Peace of mind for tenants and owners.
-    <br /> <hr/>
+    <br /> <br/>
     Pay your monthly rental amount through the portal and continue your service.
   </p>
 </footer>
