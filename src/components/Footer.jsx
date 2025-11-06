@@ -23,7 +23,7 @@ export default function Footer() {
           <FaRegBuilding className={`text-${roleColor}`} />
           <span>
             <strong className={`text-${roleColor}`}>{import.meta.env.VITE_COMPANY_NAME}</strong> ©{" "}
-            {new Date().getFullYear()} (Version: 2.0.0)
+            {new Date().getFullYear()} (v1.0)
           </span>
         </motion.div>
 
