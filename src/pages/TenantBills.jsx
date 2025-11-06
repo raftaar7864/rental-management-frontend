@@ -138,9 +138,17 @@ export default function TenantBills() {
       <Container className="pb-5 text-center">
         
           {/* Typewriter intro line */}
-          <p className="text-muted mb-0" style={{ minHeight: 24 }}>
-            <Typewriter texts={introTexts} speed={50} pause={1400} />
-          </p>
+        <p
+          className="mb-0 golden-typewriter"
+          style={{ 
+            minHeight: 24, 
+            fontWeight: "600",
+            fontSize: "1.0rem",
+            letterSpacing: "0.5px"
+          }}
+        >
+          <Typewriter texts={introTexts} speed={50} pause={1400} />
+        </p>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -422,11 +430,38 @@ export default function TenantBills() {
                       </Row>
                     </Card>
                   ))}
+                  
                 </motion.div>
               )}
             </motion.div>
           )}
         </AnimatePresence>
+{/* Footer tagline */}
+<footer
+  style={{
+    marginTop: "80px",
+    padding: "25px 10px",
+    textAlign: "center",
+    color: "#6c757d",
+    fontSize: "0.75rem",
+    lineHeight: "1.6",
+    background: "linear-gradient(180deg, #faf9f5, #fffbea)",
+    borderTop: "1px solid rgba(0,0,0,0.05)",
+    animation: "fadeIn 1.5s ease-in",
+  }}
+>
+  <p style={{ marginBottom: "0" }}>
+    <span className="golden-shimmer">DB WELLNESS PRIVATE LIMITED</span> — Trusted rental & property management.
+
+    Secure billing, instant payments and tenant-first support.
+
+    Transparent records. Easy payments. Peace of mind for tenants and owners.
+    <br /> <hr/>
+    Pay your monthly rental amount through the portal and continue your service.
+  </p>
+</footer>
+
+
       </Container>
     </div>
   );
