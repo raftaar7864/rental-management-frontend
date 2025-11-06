@@ -22,7 +22,7 @@ export default function Footer() {
         <motion.div whileHover={{ scale: 1.05 }} className="d-flex align-items-center gap-2">
           <FaRegBuilding className={`text-${roleColor}`} />
           <span>
-            <strong className={`text-${roleColor}`}>Rental Manager</strong> ©{" "}
+            <strong className={`text-${roleColor}`}>{import.meta.env.VITE_COMPANY_NAME}</strong> ©{" "}
             {new Date().getFullYear()} (Version: 2.0.0)
           </span>
         </motion.div>
