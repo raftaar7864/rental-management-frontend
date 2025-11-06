@@ -341,42 +341,25 @@ html, body, #root {
   display: none !important; /* Chrome, Edge, Safari */
 }
 
-/* Prevent native page scroll (no vertical or horizontal page scroll visible or usable) */
-html, body {
-  overflow-x: hidden !important;
-  overflow-y: hidden !important;
-}
-
 .golden-shimmer {
-  background: linear-gradient(
-    90deg,
-    #6b4e00,
-    #b8860b,
-    #ffd700,
-    #fff8dc,
-    #b8860b,
-    #6b4e00
-  );
+  background: linear-gradient(90deg, #b8860b, #ffd700, #161512, #b8860b);
   background-size: 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmer 2.8s linear infinite;
-  text-shadow:
-    0 0 8px rgba(255, 215, 0, 0.4),
-    0 0 15px rgba(255, 223, 80, 0.3),
-    0 0 25px rgba(255, 240, 120, 0.25);
-  font-weight: 700;
-  letter-spacing: 0.6px;
+  animation: shimmer 3s linear infinite;
 }
-
 @keyframes shimmer {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* small responsive adjustments */
+@media (max-width: 880px) {
+  footer > div { gap: 20px; }
 }
-
+@media (max-width: 640px) {
+  footer > div { flex-direction: column; align-items: stretch; }
+  footer > div > div:last-child { align-self: flex-start; }
+  footer h6 { text-align: left; }
+}
