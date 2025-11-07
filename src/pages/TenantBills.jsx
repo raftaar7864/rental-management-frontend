@@ -768,7 +768,7 @@ const footerLinkHint = { fontSize: "0.78rem", color: "#6c757d", marginTop: 2 };
                 <li>
                   <Link to="/refund-policy" style={footerLinkStyle}>
                     <AlertCircle size={16} /> <span style={footerLinkText}>Refund & Cancellation</span>
-                    <div style={footerLinkHint}>Return & cancel policy</div>
+                    <div style={footerLinkHint}>Refund policy</div>
                   </Link>
                 </li>
                 <li>
