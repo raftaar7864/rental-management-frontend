@@ -10,22 +10,15 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#4f46e5" />
 
-    <!-- SEO / Social (Open Graph + Twitter) -->
     <meta property="og:title" content="Rental Manager" />
     <meta property="og:description" content="Manage buildings, rooms, tenants and payments with a simple dashboard." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/og-image.png" />
     <meta property="og:url" content="/" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Rental Manager" />
-    <meta name="twitter:description" content="Manage buildings, rooms, tenants and payments with a simple dashboard." />
-    <meta name="twitter:image" content="/og-image.png" />
-
     <!-- Icons / Manifest -->
     <!-- Replace /favicon.ico and /icons/* with your app icons -->
     <link rel="icon" href="/favicon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="msapplication-TileColor" content="#4f46e5" />
 
@@ -44,11 +37,22 @@
       html,body { background: #f9fafb; color: #111827; }
       body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
     </style>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-5GFCMMF7');</script>
+    <!-- End Google Tag Manager -->
 
     <!-- Vite HMR client (development) will be injected automatically by Vite -->
   </head>
 
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5GFCMMF7"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <div id="root"></div>
 
     <!-- Noscript fallback -->
