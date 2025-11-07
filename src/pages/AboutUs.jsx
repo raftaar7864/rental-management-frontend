@@ -5,23 +5,49 @@ const AboutUs = () => {
   return (
     <Container className="py-2">
 
-        <h2 className="mb-4">About Us</h2>
-        <p>
-          Welcome to <strong>{import.meta.env.VITE_COMPANY_NAME}</strong>, 
-          your trusted partner in rental and property management solutions.
-        </p>
-        <p>
-          We aim to simplify the management of tenants, rooms, and billing with 
-          user-friendly digital tools. Our mission is to deliver transparency, 
-          convenience, and peace of mind to both tenants and property managers.
-        </p>
-        <p>
-          With seamless Razorpay integration, automated billing, and secure record 
-          handling, we’re building a modern, efficient platform for property management.
-        </p>
-        <p>
-          <strong>Our Values:</strong> Trust • Innovation • Simplicity • Transparency
-        </p>
+    <h2 className="mb-4">About Us</h2>
+
+    <p>
+      Welcome to <strong>{import.meta.env.VITE_COMPANY_NAME}</strong> — a platform we personally built 
+      to make rental payments and property management simpler, faster, and more transparent for my tenants.
+    </p>
+
+    <p>
+      As a property owner, We understand the everyday challenges tenants face when it comes to paying rent 
+      or tracking their monthly bills. That’s why we created this online system — to make the entire process 
+      effortless, secure, and fully transparent. Through this portal, tenants can easily view their bills, 
+      make payments online, and instantly download invoices — all in one place.
+    </p>
+
+    <p>
+      We personally manage the renting of rooms and the collection of rent every month. The system ensures 
+      every payment is properly recorded, and both tenants and We receive clear, organized records. With 
+      <strong> Razorpay integration</strong>, each transaction is processed safely and instantly, without 
+      confusion or delay.
+    </p>
+
+    <p>
+      This service is designed entirely for tenants within India — we accept payments only in Indian Rupees (INR). 
+      We do not collect or process international payments.
+    </p>
+
+    <p>
+      My goal has always been to build a transparent and trustworthy relationship with every tenant — 
+      one where payments are simple, records are accessible, and communication is open. This platform 
+      is an extension of that belief.
+    </p>
+
+    <p>
+      <strong>{import.meta.env.VITE_COMPANY_NAME}</strong> stands on four key values: 
+      <strong> Trust, Transparency, Simplicity, and Reliability.</strong>
+    </p>
+
+    <p style={{ marginTop: "10px" }}>
+      Thank you for being a part of this journey. Together, we’re making rental management 
+      smarter, smoother, and stress-free — one payment at a time.
+    </p>
+
+
          {/* Digital Stamp */}
           <div
             style={{
@@ -50,4 +76,3 @@ const AboutUs = () => {
 };
 
 export default AboutUs;
-
