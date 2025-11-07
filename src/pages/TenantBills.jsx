@@ -635,7 +635,9 @@ const footerLinkHint = { fontSize: "0.78rem", color: "#6c757d", marginTop: 2 };
                   </strong>
 
                   <p style={{ margin: "0 0 8px 0", textAlign: "left" }}>
-                    We deliver simple, secure and transparent rental billing for tenants and property owners.
+                    We deliver simple, secure, and transparent rental billing for tenants and property owners. 
+                    Our services include renting rooms to tenants and collecting monthly room rent through our secure online portal. 
+                    We do not collect international payments — all payments are accepted only in INR (Indian Rupees). 
                     Instant Razorpay payments, downloadable invoices, and tenant-focused support help you stay organized.
                   </p>
 
