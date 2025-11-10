@@ -22,7 +22,7 @@ import {
   ToggleButton,
   ButtonGroup,
 } from "react-bootstrap";
-import { Phone, House, User, Eye, Edit, Trash2, LogOut, UserRoundPlus, Search } from "lucide-react";
+import { Phone, House, User, Eye, Edit, Trash2, LogOut, UserPlus, Search } from "lucide-react";
 
 import TenantView from "./TenantView";
 import TenantForm from "./TenantForm";
@@ -106,9 +106,8 @@ const TenantCard = ({ tenant, onView, onEdit, onDelete, onMarkLeave }) => {
                   title: "Delete",
                   label: "Delete",
                   color: "danger",
-                  handler: () => {
-                    if (window.confirm("Delete tenant? This will remove record.")) onDelete(tenant);
-                  },
+                  // removed inline confirm — parent will show modal
+                  handler: () => onDelete(tenant),
                 },
                 !moveOutDate && {
                   icon: LogOut,
@@ -195,8 +194,11 @@ const AdminTenants = () => {
   const [markLeaveId, setMarkLeaveId] = useState(null);
   const [leaveDate, setLeaveDate] = useState("");
 
+  // delete tenant confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetTenant, setDeleteTargetTenant] = useState(null);
+
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grid");
 
@@ -208,7 +210,7 @@ const AdminTenants = () => {
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search.toLowerCase()), 300);
+    const t = setTimeout(() => setSearch((s) => s), 300); // keep existing behaviour, but search used directly
     return () => clearTimeout(t);
   }, [search]);
 
@@ -263,10 +265,19 @@ const AdminTenants = () => {
     loadRooms();
   }, [selectedBuildingForQuickAdd]);
 
-  const handleDelete = async (t) => {
+  // open tenant delete confirmation (instead of immediate delete)
+  const handleDelete = (tenant) => {
+    setDeleteTargetTenant(tenant);
+    setShowDeleteConfirm(true);
+  };
+
+  const doDeleteTenant = async () => {
+    if (!deleteTargetTenant) return;
     try {
-      await deleteTenant(t._id);
+      await deleteTenant(deleteTargetTenant._id);
       toast.success("Tenant deleted");
+      setShowDeleteConfirm(false);
+      setDeleteTargetTenant(null);
       await loadTenants();
     } catch (err) {
       console.error(err);
@@ -431,7 +442,7 @@ const AdminTenants = () => {
           </div>
 
         <div className="d-flex gap-2 align-items-center mt-2">
-          <InputGroup style={{ width: 280 }} className="search-input">
+          <InputGroup style={{ width: 320 }} className="search-input">
             <div
               style={{
                 position: "absolute",
@@ -451,7 +462,7 @@ const AdminTenants = () => {
                 aria-label="Search tenants"
                 style={{ paddingLeft: 36, borderRadius: 10 }}
               />
-                <Button variant="outline-secondary" onClick={() => { setSearch(""); setDebouncedSearch(""); }}>
+                <Button variant="outline-secondary" onClick={() => { setSearch(""); }}>
                   Clear
                 </Button>
                 </InputGroup>
@@ -513,7 +524,7 @@ const AdminTenants = () => {
                  Quick Add
               </Button>
             <Button variant="primary" onClick={openAddTenant}>
-              <UserRoundPlus size ="16"/> Tenant
+              <UserPlus size ={16}/> Tenant
             </Button>  
             </div>
           </div>
@@ -594,7 +605,7 @@ const AdminTenants = () => {
               ) : (
                 <Form.Select value={selectedRoomForQuickAdd || ""} onChange={(e) => setSelectedRoomForQuickAdd(e.target.value)}>
                   <option value="">-- Select room --</option>
-                  {roomsForBuilding.map((r) => <option key={r._id} value={r._id}>{r.number}</option>)}
+                  {roomsForBuilding.map((r) => <option key={r._id} value={r._id}>{r.number}</option>) }
                 </Form.Select>
               )}
             </Form.Group>
@@ -624,6 +635,21 @@ const AdminTenants = () => {
           <Button variant="warning" onClick={confirmMarkLeave}>Confirm</Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Delete tenant confirm (admin only) */}
+      <Modal show={showDeleteConfirm} onHide={() => setShowDeleteConfirm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Tenant</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete tenant <strong>{deleteTargetTenant?.fullName || deleteTargetTenant?.tenantId || deleteTargetTenant?._id}</strong>? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+          <Button variant="danger" onClick={doDeleteTenant}>Delete</Button>
+        </Modal.Footer>
+      </Modal>
+
     </Container>
   );
 
