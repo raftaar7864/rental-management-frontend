@@ -116,6 +116,10 @@ export default function GenerateBill() {
   // NEW: send notifications checkbox state
   const [sendNotifications, setSendNotifications] = useState(false);
 
+  // NEW: delete confirmation modal state (replaces window.confirm)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetBillId, setDeleteTargetBillId] = useState(null);
+
   const prevValidMonth = useRef(selectedMonth);
   const { user } = useContext(AuthContext);
 
@@ -408,16 +412,33 @@ export default function GenerateBill() {
     }
   };
 
-  const handleDeleteBill = async (billId) => {
-    if (!window.confirm("Delete bill?")) return;
+  // NEW: open delete confirmation modal (replaces window.confirm)
+  const openDeleteBillConfirm = (billId) => {
+    setDeleteTargetBillId(billId);
+    setShowDeleteConfirm(true);
+  };
+
+  const doDeleteBill = async () => {
+    if (!deleteTargetBillId) return;
     try {
-      await BillService.deleteBill(billId);
+      setActionLoading(true);
+      await BillService.deleteBill(deleteTargetBillId);
       toast.success("Bill deleted");
-      fetchRoomsForMonth(selectedBuilding, selectedMonth);
+      setShowDeleteConfirm(false);
+      setDeleteTargetBillId(null);
+      await fetchRoomsForMonth(selectedBuilding, selectedMonth);
     } catch (err) {
-      console.error("handleDeleteBill", err);
-      toast.error("Failed to delete");
+      console.error("doDeleteBill", err);
+      toast.error(err?.response?.data?.message || "Failed to delete");
+    } finally {
+      setActionLoading(false);
     }
+  };
+
+  // legacy kept but unused - we use modal flow now
+  const handleDeleteBill = async (billId) => {
+    // kept for backward compatibility - prefer openDeleteBillConfirm
+    openDeleteBillConfirm(billId);
   };
 
   const handleDownloadPdf = async (billId) => {
@@ -722,9 +743,9 @@ export default function GenerateBill() {
                               )}
 
                               {user?.role !== "manager" && (
-                                <Button size="sm" variant="danger" onClick={(e) => { e.stopPropagation(); handleDeleteBill(r.billId); }}>
-                                <Trash size={14} className="me-1" /> Delete
-                              </Button>
+                                <Button size="sm" variant="danger" onClick={(e) => { e.stopPropagation(); openDeleteBillConfirm(r.billId); }}>
+                                  <Trash size={14} className="me-1" /> Delete
+                                </Button>
                               )}
                             </>
                           )}
@@ -742,6 +763,22 @@ export default function GenerateBill() {
         </Card.Body>
       </Card>
       </div>
+
+      {/* Delete bill confirm modal */}
+      <Modal show={showDeleteConfirm} onHide={() => setShowDeleteConfirm(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Bill</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete bill <strong>{deleteTargetBillId}</strong>? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+          <Button variant="danger" onClick={doDeleteBill} disabled={actionLoading}>
+            {actionLoading ? <><Spinner animation="border" size="sm" className="me-2" />Deleting...</> : "Delete"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
