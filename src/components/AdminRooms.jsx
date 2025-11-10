@@ -10,6 +10,7 @@ import { markLeaveTenant } from "../services/ManagerTenantService";
 
 import TenantForm from "../components/TenantForm";
 import TenantView from "../components/TenantView";
+import RoomView from "../components/RoomView"; // <-- import RoomView
 import IconDropdown from "../components/IconDropdown";
 import {
   Container,
@@ -48,7 +49,7 @@ const RoomCard = ({
   formattedRent,
   onEditRoom,
   openAddTenant,
-  openViewTenant,
+  openRoomView, // <-- changed prop
   openEditTenant,
   openMarkLeave,
 }) => {
@@ -90,7 +91,8 @@ const RoomCard = ({
         transition: "transform .12s ease, box-shadow .12s ease",
         ...pastelStyle,
       }}
-      onClick={() => (t ? openViewTenant(r) : openAddTenant(r))}
+      // ALWAYS open Room view on click (so you see all tenants)
+      onClick={() => openRoomView(r)}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-4px)";
         e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)";
@@ -134,7 +136,7 @@ const RoomCard = ({
                   label: "View",
                   handler: (e) => {
                     e.stopPropagation();
-                    openViewTenant(r);
+                    openRoomView(r); // <-- open room view (not tenant)
                   },
                 },
                 {
@@ -166,8 +168,8 @@ const RoomCard = ({
               <div className="fw-bold text-truncate">{tenantName}</div>
             </div>
             <Badge
-              bg="light"
-              text="dark"
+              bg="dark"
+              text="light"
               className="border"
               title="Click to copy ID"
               onClick={(e) => {
@@ -180,17 +182,6 @@ const RoomCard = ({
               <span className="fw-medium ms-1">
                 {t?.tenantId || t?._id || "-"}
               </span>
-            </Badge>
-          </div>
-
-          <div className="d-flex justify-content-between mt-2 align-items-center">
-            <div className="d-flex align-items-center gap-2">
-              <Phone size={14} className="text-muted" />
-              <div className="fw-medium text-truncate">{phone}</div>
-            </div>
-            <Badge bg="dark" text="light" className="border">
-              Rent: {" "}
-              <span className="fw-medium ms-1">{formattedRent(r, t)}</span>
             </Badge>
           </div>
         </div>
@@ -218,6 +209,7 @@ const AdminRooms = () => {
   const [editingRoomId, setEditingRoomId] = useState(null);
   const [addRoomBuildingId, setAddRoomBuildingId] = useState("");
   const [selectedTenant, setSelectedTenant] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null); // <-- new: selected room for RoomView
   const [showMarkLeaveModal, setShowMarkLeaveModal] = useState(false);
   const [markLeaveTarget, setMarkLeaveTarget] = useState(null);
   const [markLeaveDate, setMarkLeaveDate] = useState("");
@@ -249,12 +241,22 @@ const AdminRooms = () => {
     return rent ? `₹${rent.toFixed(2)}` : "-";
   };
 
+  // open add/view/edit tenant (keep these: TenantForm/TenantView still used directly)
   const openAddTenant = (room) => setSelectedTenant({ room, mode: "add" });
   const openViewTenant = (room) => setSelectedTenant({ room, mode: "view", tenant: getActiveTenant(room) });
   const openEditTenant = (room) => setSelectedTenant({ room, mode: "edit", tenant: getActiveTenant(room) });
 
+  // NEW: open room modal (RoomView)
+  const openRoomView = (room) => {
+    // refresh latest room object from rooms list (keep tenants)
+    const fresh = rooms.find((x) => x._id === room._id) || room;
+    setSelectedRoom(fresh);
+  };
+  const closeRoomView = () => setSelectedRoom(null);
+
   const openMarkLeave = (room) => {
-    const tenant = getActiveTenant(room);
+    // use active tenant from room param (room may be fresh or stale)
+    const tenant = (Array.isArray(room.tenants) ? room.tenants.find(t => !t.moveOutDate) : null);
     if (!tenant) return toast.info("No active tenant to mark leave.");
     setMarkLeaveTarget(tenant);
     setMarkLeaveDate(new Date().toISOString().split("T")[0]);
@@ -267,6 +269,7 @@ const AdminRooms = () => {
       await markLeaveTenant(markLeaveTarget._id, markLeaveDate);
       await fetchAllRooms();
       setShowMarkLeaveModal(false);
+      closeRoomView();
       toast.success("Tenant marked as left");
     } catch { toast.error("Failed to mark leave"); }
   };
@@ -397,7 +400,7 @@ const AdminRooms = () => {
                         formattedRent={formattedRent}
                         onEditRoom={openRoomModal}
                         openAddTenant={openAddTenant}
-                        openViewTenant={openViewTenant}
+                        openRoomView={openRoomView} // <-- pass new handler
                         openEditTenant={openEditTenant}
                         openMarkLeave={openMarkLeave}
                       />
@@ -424,6 +427,24 @@ const AdminRooms = () => {
         <TenantView tenant={selectedTenant.tenant} onClose={() => setSelectedTenant(null)} />
       )}
 
+      {/* Room View Modal (shows all tenants) */}
+      {selectedRoom && (
+        <RoomView
+          room={selectedRoom}
+          tenant={getActiveTenant(selectedRoom)}
+          onClose={() => setSelectedRoom(null)}
+          onOpenTenant={(tenant) => {
+            // open tenant view inside existing selectedRoom context
+            setSelectedTenant({ room: selectedRoom, mode: "view", tenant });
+          }}
+          onOpenAdd={() => {
+            setSelectedTenant({ room: selectedRoom, mode: "add" });
+          }}
+          onEdit={(room) => openEditTenant(room)}
+          onMarkLeave={(room) => openMarkLeave(room)}
+        />
+      )}
+
       {/* Mark Leave */}
       <Modal show={showMarkLeaveModal} onHide={() => setShowMarkLeaveModal(false)} centered>
         <Modal.Header closeButton><Modal.Title>Mark Leave</Modal.Title></Modal.Header>
@@ -434,7 +455,7 @@ const AdminRooms = () => {
           </Form.Group>
           <div className="mt-3">
             <div><strong>Tenant:</strong> {markLeaveTarget?.fullName || "-"}</div>
-            <div className="small text-muted">ID: {markLeaveTarget?._id || "-"}</div>
+            <div className="small text-muted">ID: {markLeaveTarget?.tenantId || "-"}</div>
           </div>
         </Modal.Body>
         <Modal.Footer>
