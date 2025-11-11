@@ -134,8 +134,8 @@ export default function NavBar({ user: propUser, onLogout: propLogout }) {
 
     { name: "Rooms", path: "/admin/rooms" },
     { name: "Tenants", path: "/admin/tenants" },
-    { name: "All Bills", path: "/admin/bills" },
     { name: "Generate Bill", path: "/admin/generate-bill" },
+        { name: "All Bills", path: "/admin/bills" },
     { name: "Managers", path: "/admin/managers" },
   ];
   const managerLinks = [
